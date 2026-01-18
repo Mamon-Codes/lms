@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Courses</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .card-hover:hover {
+            transform: translateY(-5px);
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <nav class="gradient-bg text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <h1 class="text-2xl font-bold">👨‍🏫 Instructor Portal</h1>
+                <div class="flex items-center space-x-6">
+                    <a href="/instructor/dashboard" class="hover:text-gray-200">Dashboard</a>
+                    <a href="/instructor/upload-course" class="hover:text-gray-200">Upload Course</a>
+                    <a href="/logout" class="hover:text-gray-200">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <h2 class="text-3xl font-bold mb-8">My Courses</h2>
+
+        <% if (courses.length> 0) { %>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <% courses.forEach(course=> { %>
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden card-hover">
+                        <div class="h-32 gradient-bg"></div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold mb-2">
+                                <%= course.title %>
+                            </h3>
+                            <p class="text-gray-600 mb-4 text-sm line-clamp-2">
+                                <%= course.description %>
+                            </p>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Price:</span>
+                                    <span class="font-semibold">$<%= parseFloat(course.price).toFixed(2) %></span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Students:</span>
+                                    <span class="font-semibold">
+                                        <%= course.enrollment_count %>
+                                    </span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Sales Revenue (70%):</span>
+                                    <span class="font-semibold text-green-600">
+                                        $<%= (parseFloat(course.price) * 0.7 * course.enrollment_count).toFixed(2) %>
+                                    </span>
+                                </div>
+                                <div class="flex justify-between text-xs text-gray-500">
+                                    <span>Uploaded:</span>
+                                    <span>
+                                        <%= new Date(course.created_at).toLocaleDateString() %>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <% }) %>
+            </div>
+            <% } else { %>
+                <div class="bg-white rounded-xl shadow-lg p-12 text-center">
+                    <div class="text-6xl mb-4">📚</div>
+                    <h3 class="text-2xl font-bold mb-3">No Courses Yet</h3>
+                    <p class="text-gray-600 mb-6">Upload your first course and start earning!</p>
+                    <a href="/instructor/upload-course"
+                        class="inline-block px-8 py-3 gradient-bg text-white rounded-lg font-semibold hover:shadow-xl transition">
+                        Upload Course
+                    </a>
+                </div>
+                <% } %>
+    </div>
+</body>
+
+</html>

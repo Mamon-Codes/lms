@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Course</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <nav class="gradient-bg text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <h1 class="text-2xl font-bold">👨‍🏫 Instructor Portal</h1>
+                <div class="flex items-center space-x-6">
+                    <a href="/instructor/dashboard" class="hover:text-gray-200">Dashboard</a>
+                    <a href="/logout" class="hover:text-gray-200">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-4xl mx-auto px-4 py-12">
+        <div class="bg-white rounded-2xl shadow-2xl p-8">
+            <div class="text-center mb-8">
+                <div class="text-6xl mb-4">📚</div>
+                <h2 class="text-3xl font-bold mb-2">Upload New Course</h2>
+                <p class="text-gray-600">Share your knowledge and earn $500 upload bonus plus 70% commission on sales!
+                </p>
+            </div>
+
+            <% if (error) { %>
+                <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+                    <%= error %>
+                </div>
+                <% } %>
+
+                    <% if (success) { %>
+                        <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-6">
+                            <%= success %>
+                        </div>
+                        <% } %>
+
+                            <form method="POST" action="/instructor/upload-course">
+                                <div class="mb-6">
+                                    <label class="block text-gray-700 font-semibold mb-2">Course Title*</label>
+                                    <input type="text" name="title" required
+                                        class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
+                                        placeholder="e.g., Advanced JavaScript Programming">
+                                </div>
+
+                                <div class="mb-6">
+                                    <label class="block text-gray-700 font-semibold mb-2">Description*</label>
+                                    <textarea name="description" required rows="4"
+                                        class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
+                                        placeholder="Describe what students will learn..."></textarea>
+                                </div>
+
+                                <div class="mb-6">
+                                    <label class="block text-gray-700 font-semibold mb-2">Price (USD)*</label>
+                                    <input type="number" name="price" required step="0.01" min="0"
+                                        class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
+                                        placeholder="e.g., 99.99">
+                                    <p class="text-sm text-gray-500 mt-1">You'll receive 70% of each sale</p>
+                                </div>
+
+                                <div class="border-t border-gray-200 pt-6 mb-6">
+                                    <h3 class="text-xl font-bold mb-4">Course Materials (Optional)</h3>
+                                    <p class="text-gray-600 mb-4">Add learning materials for your students</p>
+
+                                    <div id="materials-container">
+                                        <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                                            <div class="grid md:grid-cols-2 gap-4 mb-3">
+                                                <div>
+                                                    <label class="block text-sm font-semibold mb-2">Material
+                                                        Title</label>
+                                                    <input type="text" name="materialTitles[]"
+                                                        class="w-full px-3 py-2 rounded border"
+                                                        placeholder="e.g., Introduction">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-sm font-semibold mb-2">Type</label>
+                                                    <select name="materialTypes[]"
+                                                        class="w-full px-3 py-2 rounded border">
+                                                        <option value="text">Text</option>
+                                                        <option value="video">Video</option>
+                                                        <option value="audio">Audio</option>
+                                                        <option value="mcq">MCQ/Quiz</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label class="block text-sm font-semibold mb-2">Content</label>
+                                                <textarea name="materialContents[]" rows="3"
+                                                    class="w-full px-3 py-2 rounded border"
+                                                    placeholder="Text content or file URL..."></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <button type="button" onclick="addMaterial()"
+                                        class="text-pink-600 hover:text-pink-800 font-semibold">
+                                        + Add Another Material
+                                    </button>
+                                </div>
+
+                                <div class="bg-pink-50 border border-pink-200 p-4 rounded-lg mb-6">
+                                    <h4 class="font-semibold text-pink-800 mb-2">💰 Earnings Breakdown:</h4>
+                                    <ul class="text-pink-700 space-y-1">
+                                        <li>✓ $500 upload bonus (paid immediately)</li>
+                                        <li>✓ 70% commission on every sale</li>
+                                        <li>✓ Unlimited earning potential</li>
+                                    </ul>
+                                </div>
+
+                                <button type="submit"
+                                    class="w-full py-4 gradient-bg text-white rounded-lg font-semibold hover:shadow-xl transition text-lg">
+                                    Upload Course & Earn $500
+                                </button>
+                            </form>
+        </div>
+    </div>
+
+    <script>
+        function addMaterial() {
+            const container = document.getElementById('materials-container');
+            const newMaterial = document.createElement('div');
+            newMaterial.className = 'bg-gray-50 rounded-lg p-4 mb-4';
+            newMaterial.innerHTML = `
+                <div class="grid md:grid-cols-2 gap-4 mb-3">
+                    <div>
+                        <label class="block text-sm font-semibold mb-2">Material Title</label>
+                        <input 
+                            type="text" 
+                            name="materialTitles[]"
+                            class="w-full px-3 py-2 rounded border"
+                            placeholder="e.g., Introduction"
+                        >
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-2">Type</label>
+                        <select name="materialTypes[]" class="w-full px-3 py-2 rounded border">
+                            <option value="text">Text</option>
+                            <option value="video">Video</option>
+                            <option value="audio">Audio</option>
+                            <option value="mcq">MCQ/Quiz</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold mb-2">Content</label>
+                    <textarea 
+                        name="materialContents[]"
+                        rows="3"
+                        class="w-full px-3 py-2 rounded border"
+                        placeholder="Text content or file URL..."
+                    ></textarea>
+                </div>
+            `;
+            container.appendChild(newMaterial);
+        }
+    </script>
+</body>
+
+</html>

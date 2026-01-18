@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .card-hover:hover {
+            transform: translateY(-5px);
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <nav class="gradient-bg text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <h1 class="text-2xl font-bold">⚙️ Admin Portal</h1>
+                <div class="flex items-center space-x-6">
+                    <span>Welcome, <strong>
+                            <%= user.fullName %>
+                        </strong></span>
+                    <span class="px-3 py-1 bg-white bg-opacity-20 rounded-full text-xs uppercase">Admin</span>
+                    <a href="/logout" class="hover:text-gray-200">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <h2 class="text-3xl font-bold mb-8">System Dashboard</h2>
+
+        <!-- Statistics -->
+        <div class="grid md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-xl shadow-lg p-6 card-hover">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm font-semibold uppercase">LMS Balance</p>
+                        <p class="text-3xl font-bold text-blue-600">
+                            $<%= lmsBalance.toFixed(2) %>
+                        </p>
+                    </div>
+                    <div class="text-4xl">🏦</div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-lg p-6 card-hover">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm font-semibold uppercase">Total Courses</p>
+                        <p class="text-3xl font-bold text-gray-800">
+                            <%= courseCount %>
+                        </p>
+                    </div>
+                    <div class="text-4xl">📚</div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-lg p-6 card-hover">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm font-semibold uppercase">Enrollments</p>
+                        <p class="text-3xl font-bold text-green-600">
+                            <%= enrollmentCount %>
+                        </p>
+                    </div>
+                    <div class="text-4xl">✅</div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-lg p-6 card-hover">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm font-semibold uppercase">Certificates</p>
+                        <p class="text-3xl font-bold text-purple-600">
+                            <%= certificateCount %>
+                        </p>
+                    </div>
+                    <div class="text-4xl">🎓</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Users Stats -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+            <h3 class="text-xl font-bold mb-4">User Statistics</h3>
+            <div class="grid md:grid-cols-3 gap-6">
+                <% userStats.forEach(stat=> { %>
+                    <div class="text-center p-4 bg-gray-50 rounded-lg">
+                        <p class="text-gray-500 uppercase text-sm mb-2">
+                            <%= stat.role %>s
+                        </p>
+                        <p class="text-3xl font-bold">
+                            <%= stat.count %>
+                        </p>
+                    </div>
+                    <% }) %>
+            </div>
+        </div>
+
+        <!-- All Courses -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+            <h3 class="text-xl font-bold mb-4">All Courses</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b-2">
+                            <th class="text-left py-3 px-4">Course</th>
+                            <th class="text-left py-3 px-4">Instructor</th>
+                            <th class="text-left py-3 px-4">Price</th>
+                            <th class="text-left py-3 px-4">Students</th>
+                            <th class="text-left py-3 px-4">Revenue (30%)</th>
+                            <th class="text-left py-3 px-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% courses.forEach(course=> { %>
+                            <tr class="border-b hover:bg-gray-50">
+                                <td class="py-3 px-4 font-semibold">
+                                    <%= course.title %>
+                                </td>
+                                <td class="py-3 px-4">
+                                    <%= course.instructor_name %>
+                                </td>
+                                <td class="py-3 px-4">$<%= parseFloat(course.price).toFixed(2) %>
+                                </td>
+                                <td class="py-3 px-4">
+                                    <%= course.enrollment_count %>
+                                </td>
+                                <td class="py-3 px-4 text-green-600 font-semibold">
+                                    $<%= (parseFloat(course.price) * 0.30 * course.enrollment_count).toFixed(2) %>
+                                </td>
+                                <td class="py-3 px-4">
+                                    <form method="POST" action="/admin/course/<%= course.id %>/delete"
+                                        onsubmit="return confirm('Are you sure you want to delete this course? This will remove all enrollments and materials.');"
+                                        style="display: inline;">
+                                        <button type="submit"
+                                            class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition text-sm">
+                                            🗑️ Delete
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- User Balances -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+            <h3 class="text-xl font-bold mb-4">💰 All User Balances</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b-2">
+                            <th class="text-left py-3 px-4">Name</th>
+                            <th class="text-left py-3 px-4">Role</th>
+                            <th class="text-left py-3 px-4">Email</th>
+                            <th class="text-left py-3 px-4">Account Number</th>
+                            <th class="text-left py-3 px-4">Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% allUsers.forEach(userItem=> { %>
+                            <tr class="border-b hover:bg-gray-50">
+                                <td class="py-3 px-4 font-semibold">
+                                    <%= userItem.full_name %>
+                                </td>
+                                <td class="py-3 px-4">
+                                    <span
+                                        class="px-2 py-1 rounded-full text-xs font-semibold
+                                    <%= userItem.role === 'instructor' ? 'bg-pink-100 text-pink-800' : 'bg-purple-100 text-purple-800' %>">
+                                        <%= userItem.role %>
+                                    </span>
+                                </td>
+                                <td class="py-3 px-4 text-sm text-gray-600">
+                                    <%= userItem.email %>
+                                </td>
+                                <td class="py-3 px-4 text-xs font-mono">
+                                    <%= userItem.account_number || 'No account' %>
+                                </td>
+                                <td class="py-3 px-4">
+                                    <% if (userItem.balance !==null) { %>
+                                        <span class="font-bold text-green-600">
+                                            $<%= parseFloat(userItem.balance).toFixed(2) %>
+                                        </span>
+                                        <% } else { %>
+                                            <span class="text-gray-400">-</span>
+                                            <% } %>
+                                </td>
+                            </tr>
+                            <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Recent Enrollments -->
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <h3 class="text-xl font-bold mb-4">Recent Enrollments</h3>
+            <div class="space-y-3">
+                <% recentEnrollments.slice(0, 10).forEach(enrollment=> { %>
+                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                        <div class="flex-1">
+                            <p class="font-semibold">
+                                <%= enrollment.learner_name %>
+                            </p>
+                            <p class="text-sm text-gray-600">enrolled in <%= enrollment.course_title %>
+                            </p>
+                        </div>
+                        <span class="text-sm text-gray-500">
+                            <%= new Date(enrollment.enrolled_at).toLocaleDateString() %>
+                        </span>
+                    </div>
+                    <% }) %>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

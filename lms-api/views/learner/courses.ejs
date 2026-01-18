@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Courses</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 30px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <nav class="gradient-bg text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <h1 class="text-2xl font-bold">🎓 LMS Platform</h1>
+                <div class="flex items-center space-x-6">
+                    <span>Welcome, <strong>
+                            <%= user.fullName %>
+                        </strong></span>
+                    <a href="/learner/dashboard" class="hover:text-gray-200">Dashboard</a>
+                    <a href="/logout" class="hover:text-gray-200">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <div class="mb-8">
+            <h2 class="text-4xl font-bold mb-2">Explore Our Courses</h2>
+            <p class="text-gray-600 text-lg">Discover knowledge from expert instructors</p>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <% courses.forEach(course=> { %>
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden card-hover">
+                    <div class="h-48 gradient-bg flex items-center justify-center text-6xl">
+                        <%= course.title.includes('Python') ? '🐍' : course.title.includes('Web') ? '🌐' :
+                            course.title.includes('Data') ? '📊' : course.title.includes('Mobile') ? '📱' : '☁️' %>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-xl font-bold">
+                                <%= course.title %>
+                            </h3>
+                            <% if (enrolledIds.includes(course.id)) { %>
+                                <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold">
+                                    Enrolled
+                                </span>
+                                <% } %>
+                        </div>
+                        <p class="text-gray-600 mb-4 text-sm">
+                            <%= course.description %>
+                        </p>
+                        <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
+                            <span>👨‍🏫 <%= course.instructor_name %></span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-2xl font-bold gradient-bg bg-clip-text text-transparent">
+                                $<%= parseFloat(course.price).toFixed(2) %>
+                            </span>
+                            <a href="/learner/course/<%= course.id %>"
+                                class="px-6 py-2 gradient-bg text-white rounded-lg hover:shadow-lg transition">
+                                <%= enrolledIds.includes(course.id) ? 'Learn' : 'View' %>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <% }) %>
+        </div>
+
+        <% if (courses.length===0) { %>
+            <div class="text-center py-12">
+                <p class="text-gray-500 text-lg">No courses available at the moment.</p>
+            </div>
+            <% } %>
+    </div>
+</body>
+
+</html>

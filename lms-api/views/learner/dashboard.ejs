@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learner Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .card-hover:hover {
+            transform: translateY(-5px);
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <nav class="gradient-bg text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <h1 class="text-2xl font-bold">🎓 LMS Platform</h1>
+                <div class="flex items-center space-x-6">
+                    <span>Welcome, <strong>
+                            <%= user.fullName %>
+                        </strong></span>
+                    <span class="px-3 py-1 bg-white bg-opacity-20 rounded-full text-xs uppercase">Learner</span>
+                    <a href="/learner/courses" class="hover:text-gray-200">Browse Courses</a>
+                    <a href="/logout" class="hover:text-gray-200">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <h2 class="text-3xl font-bold mb-8">Dashboard</h2>
+
+        <!-- Bank Account Status -->
+        <% if (!hasBankAccount) { %>
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-6 mb-8 rounded-lg">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-semibold text-yellow-800 mb-2">🏦 Set Up Your Bank Account</h3>
+                        <p class="text-yellow-700">You need to set up a bank account to purchase courses. You'll receive
+                            <strong>$1000</strong> to get started!
+                        </p>
+                    </div>
+                    <a href="/learner/bank-setup"
+                        class="px-6 py-3 bg-yellow-500 text-white rounded-lg font-semibold hover:bg-yellow-600 transition">
+                        Set Up Now
+                    </a>
+                </div>
+            </div>
+            <% } else { %>
+                <div class="grid md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white rounded-xl shadow-lg p-6 card-hover">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500 text-sm font-semibold uppercase">Balance</p>
+                                <p class="text-3xl font-bold gradient-bg bg-clip-text text-transparent" id="balance">
+                                    <%= balance !==null ? '$' + parseFloat(balance).toFixed(2) : 'Loading...' %>
+                                </p>
+                            </div>
+                            <div class="text-4xl">💰</div>
+                        </div>
+                        <button onclick="refreshBalance()" class="mt-4 text-sm text-purple-600 hover:text-purple-800">
+                            🔄 Refresh Balance
+                        </button>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-lg p-6 card-hover">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500 text-sm font-semibold uppercase">Enrolled Courses</p>
+                                <p class="text-3xl font-bold text-gray-800">
+                                    <%= enrolledCourses.length %>
+                                </p>
+                            </div>
+                            <div class="text-4xl">📚</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-lg p-6 card-hover">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500 text-sm font-semibold uppercase">Completed</p>
+                                <p class="text-3xl font-bold text-green-600">
+                                    <%= enrolledCourses.filter(c=> c.completed).length %>
+                                </p>
+                            </div>
+                            <div class="text-4xl">✅</div>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+
+                    <!-- Enrolled Courses -->
+                    <% if (enrolledCourses && enrolledCourses.length> 0) { %>
+                        <div class="mb-8">
+                            <h3 class="text-2xl font-bold mb-4">My Courses</h3>
+                            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                <% enrolledCourses.forEach(course=> { %>
+                                    <div class="bg-white rounded-xl shadow-lg overflow-hidden card-hover">
+                                        <div class="h-32 gradient-bg"></div>
+                                        <div class="p-6">
+                                            <h4 class="text-xl font-bold mb-2">
+                                                <%= course.title %>
+                                            </h4>
+                                            <p class="text-gray-600 mb-4 text-sm line-clamp-2">
+                                                <%= course.description %>
+                                            </p>
+                                            <% if (course.completed) { %>
+                                                <span
+                                                    class="inline-block px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-semibold mb-3">
+                                                    ✓ Completed
+                                                </span>
+                                                <% } %>
+                                                    <a href="/learner/course/<%= course.id %>/learn"
+                                                        class="block w-full text-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
+                                                        <%= course.completed ? 'Review Course' : 'Continue Learning' %>
+                                                    </a>
+                                        </div>
+                                    </div>
+                                    <% }) %>
+                            </div>
+                        </div>
+                        <% } %>
+
+                            <!-- Call to Action -->
+                            <div class="bg-white rounded-xl shadow-lg p-8 text-center">
+                                <h3 class="text-2xl font-bold mb-3">Ready to Learn Something New?</h3>
+                                <p class="text-gray-600 mb-6">Explore our catalog of courses and start your learning
+                                    journey today!</p>
+                                <a href="/learner/courses"
+                                    class="inline-block px-8 py-3 gradient-bg text-white rounded-lg font-semibold hover:shadow-xl transition">
+                                    Browse All Courses
+                                </a>
+                            </div>
+    </div>
+
+    <script>
+        async function refreshBalance() {
+            try {
+                const response = await fetch('/learner/balance');
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('balance').textContent = '$' + data.balance.toFixed(2);
+                }
+            } catch (error) {
+                console.error('Error refreshing balance:', error);
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instructor Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .card-hover:hover {
+            transform: translateY(-5px);
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <nav class="gradient-bg text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <h1 class="text-2xl font-bold">👨‍🏫 Instructor Portal</h1>
+                <div class="flex items-center space-x-6">
+                    <span>Welcome, <strong>
+                            <%= user.fullName %>
+                        </strong></span>
+                    <span class="px-3 py-1 bg-white bg-opacity-20 rounded-full text-xs uppercase">Instructor</span>
+                    <a href="/instructor/upload-course" class="hover:text-gray-200">Upload Course</a>
+                    <a href="/logout" class="hover:text-gray-200">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <h2 class="text-3xl font-bold mb-8">Dashboard</h2>
+
+        <!-- Bank Account Status -->
+        <% if (!hasBankAccount) { %>
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-6 mb-8 rounded-lg">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-semibold text-yellow-800 mb-2">🏦 Set Up Your Bank Account</h3>
+                        <p class="text-yellow-700">Set up a bank account to receive payments for your courses!</p>
+                    </div>
+                    <a href="/instructor/bank-setup"
+                        class="px-6 py-3 bg-yellow-500 text-white rounded-lg font-semibold hover:bg-yellow-600 transition">
+                        Set Up Now
+                    </a>
+                </div>
+            </div>
+            <% } else { %>
+                <div class="grid md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white rounded-xl shadow-lg p-6 card-hover">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500 text-sm font-semibold uppercase">Balance</p>
+                                <p class="text-3xl font-bold text-pink-600" id="balance">
+                                    <%= balance !==null && balance !==undefined ? '$' + parseFloat(balance).toFixed(2)
+                                        : 'Loading...' %>
+                                </p>
+                            </div>
+                            <div class="text-4xl">💰</div>
+                        </div>
+                        <button onclick="refreshBalance()" class="mt-4 text-sm text-pink-600 hover:text-pink-800">
+                            🔄 Refresh
+                        </button>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-lg p-6 card-hover">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500 text-sm font-semibold uppercase">Courses</p>
+                                <p class="text-3xl font-bold text-gray-800">
+                                    <%= courses.length %>
+                                </p>
+                            </div>
+                            <div class="text-4xl">📚</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-lg p-6 card-hover">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500 text-sm font-semibold uppercase">Total Students</p>
+                                <p class="text-3xl font-bold text-blue-600">
+                                    <%= courses.reduce((sum, c)=> sum + c.enrollmentCount, 0) %>
+                                </p>
+                            </div>
+                            <div class="text-4xl">👥</div>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+
+                    <!-- My Courses -->
+                    <div class="mb-8">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-2xl font-bold">My Courses</h3>
+                            <a href="/instructor/upload-course"
+                                class="px-6 py-3 gradient-bg text-white rounded-lg font-semibold hover:shadow-xl transition">
+                                + Upload New Course
+                            </a>
+                        </div>
+
+                        <% if (courses.length> 0) { %>
+                            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                <% courses.forEach(course=> { %>
+                                    <div class="bg-white rounded-xl shadow-lg overflow-hidden card-hover">
+                                        <div class="h-32 gradient-bg"></div>
+                                        <div class="p-6">
+                                            <h4 class="text-xl font-bold mb-2">
+                                                <%= course.title %>
+                                            </h4>
+                                            <p class="text-gray-600 mb-4 text-sm line-clamp-2">
+                                                <%= course.description %>
+                                            </p>
+                                            <div class="flex items-center justify-between text-sm text-gray-600 mb-4">
+                                                <span>Price: $<%= parseFloat(course.price).toFixed(2) %></span>
+                                                <span>
+                                                    <%= course.enrollmentCount %> students
+                                                </span>
+                                            </div>
+                                            <div class="text-sm text-gray-500 mb-4">
+                                                Uploaded <%= new Date(course.created_at).toLocaleDateString() %>
+                                            </div>
+                                            <a href="/instructor/course/<%= course.id %>/materials"
+                                                class="block w-full text-center px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition">
+                                                ✏️ Manage Materials
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <% }) %>
+                            </div>
+                            <% } else { %>
+                                <div class="bg-white rounded-xl shadow-lg p-12 text-center">
+                                    <div class="text-6xl mb-4">📚</div>
+                                    <h4 class="text-2xl font-bold mb-3">No Courses Yet</h4>
+                                    <p class="text-gray-600 mb-6">Start by uploading your first course and earn $500
+                                        bonus!</p>
+                                    <a href="/instructor/upload-course"
+                                        class="inline-block px-8 py-3 gradient-bg text-white rounded-lg font-semibold hover:shadow-xl transition">
+                                        Upload Your First Course
+                                    </a>
+                                </div>
+                                <% } %>
+                    </div>
+    </div>
+
+    <script>
+        async function refreshBalance() {
+            try {
+                const response = await fetch('/instructor/balance');
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('balance').textContent = '$' + data.balance.toFixed(2);
+                }
+            } catch (error) {
+                console.error('Error refreshing balance:', error);
+            }
+        }
+    </script>
+</body>
+
+</html>

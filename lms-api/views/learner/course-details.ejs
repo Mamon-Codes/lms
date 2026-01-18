@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= course.title %>
+    </title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <nav class="gradient-bg text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <h1 class="text-2xl font-bold">🎓 LMS Platform</h1>
+                <div class="flex items-center space-x-6">
+                    <a href="/learner/courses" class="hover:text-gray-200">← Back to Courses</a>
+                    <a href="/learner/dashboard" class="hover:text-gray-200">Dashboard</a>
+                    <a href="/logout" class="hover:text-gray-200">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-6xl mx-auto px-4 py-8">
+        <div class="grid lg:grid-cols-3 gap-8">
+            <!-- Course Info -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="h-64 gradient-bg flex items-center justify-center text-8xl">
+                        <%= course.title.includes('Python') ? '🐍' : course.title.includes('Web') ? '🌐' :
+                            course.title.includes('Data') ? '📊' : course.title.includes('Mobile') ? '📱' : '☁️' %>
+                    </div>
+                    <div class="p-8">
+                        <h1 class="text-4xl font-bold mb-4">
+                            <%= course.title %>
+                        </h1>
+                        <div class="flex items-center text-gray-600 mb-6">
+                            <span class="mr-6">👨‍🏫 <strong>
+                                    <%= course.instructor_name %>
+                                </strong></span>
+                            <span>📚 <%= course.materialCount %> materials</span>
+                        </div>
+                        <p class="text-gray-700 text-lg leading-relaxed mb-6">
+                            <%= course.description %>
+                        </p>
+
+                        <% if (isEnrolled) { %>
+                            <div class="bg-green-50 border border-green-200 p-4 rounded-lg mb-4">
+                                <p class="text-green-800">✓ You are enrolled in this course!</p>
+                            </div>
+                            <a href="/learner/course/<%= course.id %>/learn"
+                                class="block w-full text-center px-6 py-4 gradient-bg text-white rounded-lg font-semibold hover:shadow-xl transition text-lg">
+                                Start Learning →
+                            </a>
+                            <% } %>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Purchase Card -->
+            <% if (!isEnrolled) { %>
+                <div class="lg:col-span-1">
+                    <div class="bg-white rounded-xl shadow-lg p-6 sticky top-8">
+                        <div class="text-center mb-6">
+                            <p class="text-gray-500 text-sm uppercase mb-2">Course Price</p>
+                            <p class="text-5xl font-bold gradient-bg bg-clip-text text-transparent">
+                                $<%= parseFloat(course.price).toFixed(2) %>
+                            </p>
+                        </div>
+
+                        <div class="border-t border-gray-200 pt-6 mb-6">
+                            <h4 class="font-semibold mb-3">This course includes:</h4>
+                            <ul class="space-y-2 text-gray-700">
+                                <li>✓ <%= course.materialCount %> learning materials</li>
+                                <li>✓ Lifetime access</li>
+                                <li>✓ Certificate upon completion</li>
+                                <li>✓ Instructor gets 70% commission</li>
+                            </ul>
+                        </div>
+
+                        <form method="POST" action="/learner/course/<%= course.id %>/purchase" id="purchaseForm">
+                            <div class="mb-4">
+                                <label class="block text-gray-700 font-semibold mb-2">Bank Account Secret</label>
+                                <input type="password" name="secret" required
+                                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500"
+                                    placeholder="Enter your account secret">
+                                <p class="text-xs text-gray-500 mt-1">Required to authorize payment</p>
+                            </div>
+
+                            <button type="submit"
+                                class="w-full py-4 gradient-bg text-white rounded-lg font-semibold hover:shadow-xl transition text-lg">
+                                Purchase Course
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                <% } %>
+        </div>
+    </div>
+</body>
+
+</html>

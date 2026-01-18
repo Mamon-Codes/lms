@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learn: <%= course.title %>
+    </title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <nav class="gradient-bg text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <h1 class="text-2xl font-bold">🎓 <%= course.title %>
+                </h1>
+                <div class="flex items-center space-x-6">
+                    <a href="/learner/dashboard" class="hover:text-gray-200">Dashboard</a>
+                    <a href="/logout" class="hover:text-gray-200">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-5xl mx-auto px-4 py-8">
+        <!-- Progress Header -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-2xl font-bold mb-2">
+                        <%= course.title %>
+                    </h2>
+                    <p class="text-gray-600">📚 Complete materials in order to unlock the next one</p>
+                </div>
+                <div class="text-center">
+                    <div class="text-5xl mb-2">
+                        <%= allCompleted ? '🎉' : '📖' %>
+                    </div>
+                    <span
+                        class="px-4 py-2 <%= allCompleted ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800' %> rounded-full text-sm font-semibold">
+                        <%= allCompleted ? 'All Materials Complete!' : 'In Progress' %>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Course Materials -->
+        <div class="space-y-6">
+            <h3 class="text-2xl font-bold">Course Materials</h3>
+
+            <% materials.forEach((material, index)=> { %>
+                <div
+                    class="bg-white rounded-xl shadow-lg p-6 <%= material.unlocked ? '' : 'opacity-60 cursor-not-allowed' %>">
+                    <div class="flex items-start">
+                        <!-- Lock/Unlock Icon -->
+                        <div class="mr-4 text-4xl">
+                            <% if (material.completed) { %>
+                                ✅
+                                <% } else if (material.unlocked) { %>
+                                    🔓
+                                    <% } else { %>
+                                        🔒
+                                        <% } %>
+                        </div>
+
+                        <div class="flex-1">
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="flex items-center gap-3">
+                                    <span
+                                        class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-semibold">
+                                        #<%= index + 1 %>
+                                    </span>
+                                    <h4 class="text-xl font-bold">
+                                        <%= material.title %>
+                                    </h4>
+                                </div>
+                                <span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-xs uppercase">
+                                    <%= material.type %>
+                                </span>
+                            </div>
+
+                            <% if (material.unlocked) { %>
+                                <!-- Show Material Content -->
+                                <% if (material.type==='text' ) { %>
+                                    <div class="prose max-w-none text-gray-700 leading-relaxed mb-4">
+                                        <%= material.content_text %>
+                                    </div>
+                                    <% } else if (material.type==='video' ) { %>
+                                        <div class="mb-4">
+                                            <% const videoUrl=material.content_text || material.content_url || '' ; let
+                                                videoId='' ; const
+                                                regExp=/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+                                                const match=videoUrl.match(regExp); if (match && match[2].length===11) {
+                                                videoId=match[2]; } %>
+                                                <% if (videoId) { %>
+                                                    <div class="relative" style="padding-bottom: 56.25%; height: 0;">
+                                                        <iframe class="absolute top-0 left-0 w-full h-full rounded-lg"
+                                                            src="https://www.youtube.com/embed/<%= videoId %>"
+                                                            frameborder="0"
+                                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                            allowfullscreen>
+                                                        </iframe>
+                                                    </div>
+                                                    <% } else { %>
+                                                        <div class="bg-gray-100 rounded-lg p-8 text-center">
+                                                            <p class="text-gray-600">🎥 Video: <%= videoUrl %>
+                                                            </p>
+                                                            <p class="text-sm text-gray-500 mt-2">Please provide a valid
+                                                                YouTube URL</p>
+                                                        </div>
+                                                        <% } %>
+                                        </div>
+                                        <% } else if (material.type==='audio' ) { %>
+                                            <div class="bg-gray-100 rounded-lg p-8 text-center mb-4">
+                                                <p class="text-gray-600">🎵 Audio: <%= material.content_text ||
+                                                        material.content_url %>
+                                                </p>
+                                                <p class="text-sm text-gray-500 mt-2">Audio player would be implemented
+                                                    here</p>
+                                            </div>
+                                            <% } else if (material.type==='mcq' ) { %>
+                                                <div class="bg-purple-50 rounded-lg p-6 mb-4">
+                                                    <% try { const mcq=JSON.parse(material.content_text); const
+                                                        quizId=`quiz-${material.id}`; %>
+                                                        <p class="font-semibold text-lg mb-4">
+                                                            <%= mcq.question %>
+                                                        </p>
+                                                        <form id="<%= quizId %>" class="space-y-2">
+                                                            <% mcq.options.forEach((option, i)=> { %>
+                                                                <label class="block cursor-pointer">
+                                                                    <input type="radio" name="answer" value="<%= i %>"
+                                                                        class="mr-2">
+                                                                    <span
+                                                                        class="p-3 inline-block w-full bg-white rounded-lg border-2 border-gray-200 hover:border-purple-400 transition">
+                                                                        <%= option %>
+                                                                    </span>
+                                                                </label>
+                                                                <% }) %>
+                                                                    <button type="button"
+                                                                        onclick="checkAnswer('<%= quizId %>', <%= (mcq.answer !== undefined ? mcq.answer : 0) %>)"
+                                                                        class="mt-4 px-6 py-3 bg-purple-500 text-white rounded-lg font-semibold hover:bg-purple-600 transition">
+                                                                        Submit Answer
+                                                                    </button>
+                                                        </form>
+                                                        <div id="<%= quizId %>-result" class="mt-4 hidden"></div>
+                                                        <% } catch(e) { %>
+                                                            <p class="text-gray-600">Quiz content error</p>
+                                                            <% } %>
+                                                </div>
+                                                <% } %>
+
+                                                    <!-- Mark Complete Button -->
+                                                    <% if (!material.completed) { %>
+                                                        <form method="POST"
+                                                            action="/learner/course/<%= course.id %>/material/<%= material.id %>/complete">
+                                                            <button type="submit"
+                                                                class="px-6 py-3 bg-green-500 text-white rounded-lg font-semibold hover:bg-green-600 transition">
+                                                                ✓ Mark as Complete
+                                                            </button>
+                                                        </form>
+                                                        <% } else { %>
+                                                            <p class="text-green-600 font-semibold">✅ Completed</p>
+                                                            <% } %>
+                                                                <% } else { %>
+                                                                    <!-- Locked Message -->
+                                                                    <div class="bg-gray-100 rounded-lg p-6 text-center">
+                                                                        <p class="text-gray-600 font-semibold">🔒 This
+                                                                            material is locked</p>
+                                                                        <p class="text-sm text-gray-500 mt-2">Complete "
+                                                                            <%= materials[index - 1] ? materials[index -
+                                                                                1].title : 'previous material' %>" to
+                                                                                unlock
+                                                                        </p>
+                                                                    </div>
+                                                                    <% } %>
+                        </div>
+                    </div>
+                </div>
+                <% }) %>
+
+                    <% if (materials.length===0) { %>
+                        <div class="bg-white rounded-xl shadow-lg p-12 text-center">
+                            <p class="text-gray-500">No materials available yet.</p>
+                        </div>
+                        <% } %>
+        </div>
+
+        <!-- Certificate Section -->
+        <% if (allCompleted) { %>
+            <div class="bg-white rounded-xl shadow-lg p-8 mt-8 text-center">
+                <h3 class="text-2xl font-bold mb-4">🎉 Congratulations!</h3>
+                <p class="text-gray-600 mb-6">You've completed all materials!</p>
+                <% if (certificate) { %>
+                    <a href="/learner/certificate/<%= enrollment.id %>"
+                        class="inline-block px-8 py-4 gradient-bg text-white rounded-lg font-semibold hover:shadow-xl transition text-lg">
+                        View Your Certificate 📜
+                    </a>
+                    <% } else { %>
+                        <form method="POST" action="/learner/course/<%= course.id %>/complete">
+                            <button type="submit"
+                                class="inline-block px-8 py-4 gradient-bg text-white rounded-lg font-semibold hover:shadow-xl transition text-lg">
+                                Claim Your Certificate 🎓
+                            </button>
+                        </form>
+                        <% } %>
+            </div>
+            <% } %>
+    </div>
+
+    <script>
+        function checkAnswer(quizId, correctAnswer) {
+            const form = document.getElementById(quizId);
+            const resultDiv = document.getElementById(quizId + '-result');
+            const selected = form.querySelector('input[name="answer"]:checked');
+
+            if (!selected) {
+                alert('Please select an answer!');
+                return;
+            }
+
+            const selectedValue = parseInt(selected.value);
+            const isCorrect = selectedValue === correctAnswer;
+
+            // Get all radio inputs and their corresponding spans
+            const radios = form.querySelectorAll('input[name="answer"]');
+            radios.forEach((radio) => {
+                const label = radio.parentElement;
+                const span = label.querySelector('span');
+                const radioValue = parseInt(radio.value);
+
+                // Highlight correct answer in green
+                if (radioValue === correctAnswer) {
+                    span.className = 'p-3 inline-block w-full rounded-lg border-2 border-green-500 bg-green-50 font-semibold';
+                    const originalText = span.textContent.trim();
+                    span.textContent = originalText + ' ✅ Correct Answer';
+                }
+                // Highlight wrong selected answer in red
+                else if (radioValue === selectedValue && !isCorrect) {
+                    span.className = 'p-3 inline-block w-full rounded-lg border-2 border-red-500 bg-red-50';
+                    const originalText = span.textContent.trim();
+                    span.textContent = originalText + ' ❌';
+                }
+
+                // Disable all radios
+                radio.disabled = true;
+            });
+
+            // Show result message
+            resultDiv.classList.remove('hidden');
+            resultDiv.className = 'mt-4 p-4 rounded-lg ' + (isCorrect ? 'bg-green-100 border-2 border-green-500' : 'bg-red-100 border-2 border-red-500');
+            resultDiv.innerHTML = isCorrect
+                ? '<p class="font-bold text-green-800">✅ Correct! Well done!</p>'
+                : '<p class="font-bold text-red-800">❌ Incorrect. The correct answer is highlighted in green.</p>';
+
+            // Disable submit button
+            const submitBtn = form.querySelector('button');
+            submitBtn.disabled = true;
+            submitBtn.className = 'mt-4 px-6 py-3 bg-gray-400 text-white rounded-lg font-semibold cursor-not-allowed';
+            submitBtn.textContent = 'Answered';
+        }
+    </script>
+</body>
+
+</html>

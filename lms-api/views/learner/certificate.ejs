@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificate</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .certificate {
+            font-family: 'Playfair Display', serif;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <nav class="gradient-bg text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <h1 class="text-2xl font-bold">🎓 LMS Platform</h1>
+                <div class="flex items-center space-x-6">
+                    <a href="/learner/dashboard" class="hover:text-gray-200">Dashboard</a>
+                    <a href="/logout" class="hover:text-gray-200">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-4xl mx-auto px-4 py-12">
+        <!-- Certificate -->
+        <div class="bg-white rounded-2xl shadow-2xl p-12 border-8 border-double" style="border-color: #667eea;">
+            <div class="text-center">
+                <div class="text-6xl mb-6">🎓</div>
+                <h1 class="certificate text-5xl font-bold mb-6 gradient-bg bg-clip-text text-transparent">
+                    Certificate of Completion
+                </h1>
+                <p class="text-gray-600 text-lg mb-8">This is to certify that</p>
+                <h2 class="text-4xl font-bold mb-8" style="color: #667eea;">
+                    <%= certificate.learner_name %>
+                </h2>
+                <p class="text-gray-600 text-lg mb-4">has successfully completed the course</p>
+                <h3 class="text-3xl font-bold mb-8">
+                    <%= certificate.course_title %>
+                </h3>
+                <div class="flex justify-around items-center pt-8 border-t border-gray-200">
+                    <div class="text-center">
+                        <p class="text-sm text-gray-500 uppercase mb-2">Date</p>
+                        <p class="font-semibold">
+                            <%= new Date(certificate.completed_at).toLocaleDateString() %>
+                        </p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-sm text-gray-500 uppercase mb-2">Certificate ID</p>
+                        <p class="font-semibold font-mono text-sm">
+                            <%= certificate.certificate_code %>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-8">
+            <button onclick="window.print()"
+                class="px-8 py-3 gradient-bg text-white rounded-lg font-semibold hover:shadow-xl transition">
+                🖨️ Print Certificate
+            </button>
+            <a href="/learner/dashboard"
+                class="ml-4 px-8 py-3 bg-gray-200 text-gray-800 rounded-lg font-semibold hover:bg-gray-300 transition">
+                Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <style>
+        @media print {
+
+            nav,
+            .text-center.mt-8 {
+                display: none;
+            }
+
+            body {
+                background: white;
+            }
+        }
+    </style>
+</body>
+
+</html>
